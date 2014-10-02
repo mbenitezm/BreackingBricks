@@ -1,3 +1,6 @@
+// Marcel Benítez 1139855
+//Daniela Valdés Guerra 813724
+
 package breakingbricks;
 
 import breakingbricks.SoundClip;
@@ -5,6 +8,7 @@ import javax.swing.JFrame;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -19,26 +23,26 @@ public class BreakingBricks extends JFrame implements Runnable, KeyListener{
     private long tiempoActual;   // Tiempo actual del juego
     private Image dbImage;	// Imagen a proyectar	
     private Graphics dbg;	// Objeto grafico
-    private SoundClip fondoM;    // Musica de fondo del juego
+    private SoundClip sFondoM;    // Musica de fondo del juego
     private SoundClip sColision; // Sonido de colision de objetos
-    private Pelota bola;          // Objeto bola.
-    private Meth1 pill;        // Objeto Bloque usado para inicializar las listas 1 y 3
-    private Meth2 pillR;      // Objeto BloqueR usado para inicializar las listas 2 y 4
-    private Camion bar;         // Objeto barra, es el movido por el jugador.
-    private int vidas;          // Contador de vidas
-    private Image game_over;    // Imagen de victoria
-    private Image victoria;       // Imagen de derrota
+    private Pelota pelPelota;          // Objeto bola.
+    private Meth1 metCrist1;        // Objeto Meth1
+    private Meth2 metCrist2;      // Objeto Meth2
+    private Camion camCamion;         // Objeto tipo Camion
+    private int iVidas;          // Contador de vidas
+    private Image imaGameOver;    // Imagen de derrota
+    private Image imaVictoria;       // Imagen de victoria
     private Image imaInicio;    // Imagen de inicio con instrucciones
-    private int direccion;      // Variable para la dirección del personaje
-    private int score;          // Variable de puntuacion
-    private boolean bMover;       // Variable utilizada para saber si el personaje se esta moviendo o no
+    private int iDireccion;      // Variable para la dirección del personaje
+    private int iScore;          // Variable de puntuacion
+    private boolean bMover;       // Variable para saber si se mueve
     private boolean bPausa;      // Booleano para pausar
-    private boolean bMovBola;  // Booleano que indica si la bola se esta moviendo
+    private boolean bMovBola;  // Booleano que indica si la bola se esta moviend
     private boolean bInicio; // Booleando que indica si el juego y ase inicio
-    private LinkedList<Meth1> lista1; // Listas de metanfetaminas
-    private LinkedList<Meth2> lista2;
-    private LinkedList<Meth1> lista3;
-    private LinkedList<Meth2> lista4;
+    private LinkedList<Meth1> lnkCol1; // Listas de metanfetaminas
+    private LinkedList<Meth2> lnkCol2;
+    private LinkedList<Meth1> lnkCol3;
+    private LinkedList<Meth2> lnkCol4;
     private Image fondo;        // Imagen de fondo
 
     /**
@@ -57,107 +61,124 @@ public class BreakingBricks extends JFrame implements Runnable, KeyListener{
      */
     public void init() {
         setSize(800, 640);
-        //acabarjuego = false;
-        lista1 = new LinkedList();
-        lista2 = new LinkedList();
-        lista3 = new LinkedList();
-        lista4 = new LinkedList();
+        // Se crean las colleciones que tendran los cristales por fila
+        lnkCol1 = new LinkedList();
+        lnkCol2 = new LinkedList();
+        lnkCol3 = new LinkedList();
+        lnkCol4 = new LinkedList();
+        // El juego empieza sin estar en pausa
         bPausa = false;
+        // No se mueve la abarra
         bMover = false;
+        // No se mueve la bola
         bMovBola = false;
+        // Arranca con la pantalla de inicio
         bInicio = false;
-        direccion = 0;
-        score = 0;                    //puntaje inicial
-        vidas = 3;                    //vidaas iniciales
-        fondoM = new SoundClip("Bsong.wav");
+        iDireccion = 0;
+        //puntaje inicial
+        iScore = 0;  
+        //vidaas iniciales
+        iVidas = 3;          
+        // Se declara soundclip del fondo
+        sFondoM = new SoundClip("Bsong.wav");
+        // Se declara soundclip de las colisiones
         sColision = new SoundClip ("ping.wav");
-        bar = new Camion(getWidth() / 2, getHeight() - 30);
-        bar.setPosX(getWidth() / 2 - bar.getAncho() / 2);
-        setBackground(Color.black);
+        // Se crea el objeto camion
+        camCamion = new Camion(getWidth() / 2, getHeight() - 30);
+        camCamion.setPosX(getWidth() / 2 - camCamion.getAncho() / 2);
         addKeyListener(this);
-        bola = new Pelota(bar.getPosX() + 25, bar.getPosY() - 25);
-        for (int i = 1; i < 15; i++){
+        // Se crea objeto de Pelota
+        pelPelota = new Pelota(camCamion.getPosX() + 25, camCamion.getPosY() 
+                - 25);
+        // Se crea la primera fila de cristales
+        for (int i = 1; i < 16; i++){
             if (i == 1) {
-                pill = new Meth1(40, 70);
-                lista1.add(pill);
+                metCrist1 = new Meth1(40, 70);
+                lnkCol1.add(metCrist1);
             } 
             else{
-                Meth1 pillaux = (Meth1) lista1.get(i - 2);
-                pill = new Meth1(pillaux.getPosX() + 50, pillaux.getPosY());
-                lista1.add(pill);
+                Meth1 metCrist1aux = (Meth1) lnkCol1.get(i - 2);
+                metCrist1 = new Meth1(metCrist1aux.getPosX() + 50
+                        , metCrist1aux.getPosY());
+                lnkCol1.add(metCrist1);
             }
         }
-        
-        for (int i = 1; i < 15; i++){
-            if (i == 1) {
-                pillR = new Meth2(40, 120);
-                lista2.add(pillR);
-            } 
-            else{
-                Meth2 pillaux = (Meth2) lista2.get(i - 2);
-                pillR = new Meth2(pillaux.getPosX() + 50, pillaux.getPosY());
-                lista2.add(pillR);
-            }
-
-        }
-        for (int i = 1; i < 15; i++){
+        // Se crea la segunda fila de cristales
+        for (int i = 1; i < 16; i++){
             if (i == 1){
-                pill = new Meth1(40, 170);
-                lista3.add(pill);
+                metCrist2 = new Meth2(40, 120);
+                lnkCol2.add(metCrist2);
             } 
             else{
-                Meth1 pillaux = (Meth1) lista3.get(i - 2);
-                pill = new Meth1(pillaux.getPosX() + 50, pillaux.getPosY());
-                lista3.add(pill);
+                Meth2 metCrist1aux = (Meth2) lnkCol2.get(i - 2);
+                metCrist2 = new Meth2(metCrist1aux.getPosX() + 50
+                        , metCrist1aux.getPosY());
+                lnkCol2.add(metCrist2);
             }
-        }
-        for (int i = 1; i < 15; i++){
-            if (i == 1) {
-                pillR = new Meth2(40, 220);
-                lista4.add(pillR);
-            } 
-            else{
-                Meth2 pillaux = (Meth2) lista4.get(i - 2);
-                pillR = new Meth2(pillaux.getPosX() + 50, pillaux.getPosY());
-                lista4.add(pillR);
-            }
-        }
 
+        }
+        // Se crea la tercera fila de cristales
+        for (int i = 1; i < 16; i++){
+            if (i == 1){
+                metCrist1 = new Meth1(40, 170);
+                lnkCol3.add(metCrist1);
+            } 
+            else{
+                Meth1 metCrist1aux = (Meth1) lnkCol3.get(i - 2);
+                metCrist1 = new Meth1(metCrist1aux.getPosX() + 50, 
+                        metCrist1aux.getPosY());
+                lnkCol3.add(metCrist1);
+            }
+        }
+        // Se crea la ultima fila de cristales
+        for (int i = 1; i < 16; i++){
+            if (i == 1){
+                metCrist2 = new Meth2(40, 220);
+                lnkCol4.add(metCrist2);
+            } 
+            else{
+                Meth2 metCrist1aux = (Meth2) lnkCol4.get(i - 2);
+                metCrist2 = new Meth2(metCrist1aux.getPosX() + 50
+                        , metCrist1aux.getPosY());
+                lnkCol4.add(metCrist2);
+            }
+        }
+        // Se crean las imagenes que se utilizaran 
         URL goURL = this.getClass().getResource("game over.png");
-        game_over = Toolkit.getDefaultToolkit().getImage(goURL)
+        imaGameOver = Toolkit.getDefaultToolkit().getImage(goURL)
                 .getScaledInstance(getWidth(), getHeight(), 1);
         URL fURL = this.getClass().getResource("fondo.jpg");
         fondo = Toolkit.getDefaultToolkit().getImage(fURL)
                 .getScaledInstance(getWidth(), getHeight(), 1);
         URL aURL = this.getClass().getResource("ganaste.png");
-        victoria = Toolkit.getDefaultToolkit().getImage(aURL)
+        imaVictoria = Toolkit.getDefaultToolkit().getImage(aURL)
                 .getScaledInstance(getWidth(), getHeight(), 1);
         URL iURL = this.getClass().getResource("inicio.png");
         imaInicio = Toolkit.getDefaultToolkit().getImage(iURL)
                 .getScaledInstance(getWidth(), getHeight(), 1); 
-             
+        // Se crean imagenes para animacion del camion     
         Image camionsito1 = Toolkit.getDefaultToolkit().getImage(this.getClass()
                 .getResource("rv1.png"))
-                .getScaledInstance(80, 18, bar.getPosY());
+                .getScaledInstance(80, 18, camCamion.getPosY());
         Image camionsito2 = Toolkit.getDefaultToolkit().getImage(this.getClass()
                 .getResource("rv2.png"))
-                .getScaledInstance(80, 18, bar.getPosY());
+                .getScaledInstance(80, 18, camCamion.getPosY());
         Image camionsito3 = Toolkit.getDefaultToolkit().getImage(this.getClass()
                 .getResource("rv3.png"))
-                .getScaledInstance(80, 18, bar.getPosY());
+                .getScaledInstance(80, 18, camCamion.getPosY());
         Image camionsito4 = Toolkit.getDefaultToolkit().getImage(this.getClass()
                 .getResource("rv4.png"))
-                .getScaledInstance(80, 18, bar.getPosY());
+                .getScaledInstance(80, 18, camCamion.getPosY());
         Image camionsito5 = Toolkit.getDefaultToolkit().getImage(this.getClass()
                 .getResource("rv5.png"))
-                .getScaledInstance(80, 18, bar.getPosY());
+                .getScaledInstance(80, 18, camCamion.getPosY());
         Image camionsito6 = Toolkit.getDefaultToolkit().getImage(this.getClass()
                 .getResource("rv6.png"))
-                .getScaledInstance(80, 18, bar.getPosY());
+                .getScaledInstance(80, 18, camCamion.getPosY());
         Image camionsito7 = Toolkit.getDefaultToolkit().getImage(this.getClass()
                 .getResource("rv7.png"))
-                .getScaledInstance(80, 18, bar.getPosY());
-
+                .getScaledInstance(80, 18, camCamion.getPosY());
+        // Se crea la animacion del camion
         aniCamion = new Animacion();
         aniCamion.sumaCuadro(camionsito1, 100);
         aniCamion.sumaCuadro(camionsito2, 100);
@@ -166,7 +187,7 @@ public class BreakingBricks extends JFrame implements Runnable, KeyListener{
         aniCamion.sumaCuadro(camionsito5, 100);
         aniCamion.sumaCuadro(camionsito6, 100);
         aniCamion.sumaCuadro(camionsito7, 100);
-        
+        // Se crean las imagenes para la animacion de la bola 
         Image bola1 = Toolkit.getDefaultToolkit().getImage(this.getClass()
                 .getResource("pelota1.png")).getScaledInstance(25, 25, 1);
         Image bola2 = Toolkit.getDefaultToolkit().getImage(this.getClass()
@@ -185,7 +206,7 @@ public class BreakingBricks extends JFrame implements Runnable, KeyListener{
                 .getResource("pelota8.png")).getScaledInstance(25, 25, 1);
         Image bola9 = Toolkit.getDefaultToolkit().getImage(this.getClass()
                 .getResource("pelota9.png")).getScaledInstance(25, 25, 1);   
-          
+        // Se crea la animacion de la bola  
         aniPelota = new Animacion();
         aniPelota.sumaCuadro(bola1, 100);
         aniPelota.sumaCuadro(bola2, 100);
@@ -206,8 +227,9 @@ public class BreakingBricks extends JFrame implements Runnable, KeyListener{
     
     public void start() {
         // Declaras un hilo
-        fondoM.setLooping(true);
-        fondoM.play();
+        // Loop de la musica de fondo
+        sFondoM.setLooping(true);
+        sFondoM.play();
         Thread th = new Thread(this);
         // Empieza el hilo
         th.start();
@@ -221,15 +243,18 @@ public class BreakingBricks extends JFrame implements Runnable, KeyListener{
      * se repinta el <code>Applet</code> y luego manda a dormir el hilo.
      *
      */
-    public void run() {
+    public void run(){
+        // Guarda el tiempo actual del sistema
         tiempoActual = System.currentTimeMillis();
         
         while (true){
+            // Si el juego no esta pausado se actualiza y se checa colision
             if (!bPausa){
                 actualiza();
                 checaColision();
             }
-            repaint();    // Se actualiza el <code>Applet</code> repintando el contenido.
+            // Se actualiza el <code>Applet</code> repintando el contenido.
+            repaint();    
             try {
                 // El thread se duerme.
                 Thread.sleep(20);
@@ -241,38 +266,44 @@ public class BreakingBricks extends JFrame implements Runnable, KeyListener{
     /**
      * Metodo <I>actualiza</I>.
      * <P>
-     * En este metodo se actualizan las posiciones de link como de la armadura,
-     * ya sea por presionar una tecla o por bMoverrlos con el mouse.
+     * Actualiza las posiciones de las animaciones y bojetos, asi como 
+     * el tiempo actual del sistema
      */
     public void actualiza(){
+        // Tiempo transcurrido desde que inicio el juego
         long tiempoTranscurrido=System.currentTimeMillis() - tiempoActual;
         //Guarda el tiempo actual
         tiempoActual += tiempoTranscurrido;
-        //Actualiza la animación en base al tiempo transcurrido
+        //Actualiza la animación de camion y pel en base al tiempo transcurrido
         aniCamion.actualiza(tiempoTranscurrido);
         aniPelota.actualiza(tiempoTranscurrido);
-         
+        
+        // Si se presiono a las teclas de derecha o izquierda se le da velocidad
+        // a la barra
         if (bMover){
-            bar.setMoviendose(true);
-            switch (direccion){
+            camCamion.setMoviendose(true);
+            switch (iDireccion){
                 case 3:{
-                    bar.setPosX(bar.getPosX() - 5);
-                    break; //se mueve hacia la izquierda
+                    //se mueve hacia la izquierda
+                    camCamion.setPosX(camCamion.getPosX() - 5);
+                    break;
                 }
                 case 4:{
-                    bar.setPosX(bar.getPosX() + 5);
-                    break; //se mueve hacia la derecha
+                    //se mueve hacia la derecha
+                    camCamion.setPosX(camCamion.getPosX() + 5);
+                    break; 
                 }
             }
         }
-        
-        if (bMovBola) {
-            bola.setPosX(bola.getPosX() + bola.getVelX());
-            bola.setPosY(bola.getPosY() + bola.getVelY());
+        // Si la vola se esta moviendo se le asigna velocidad
+        if (bMovBola){
+            pelPelota.setPosX(pelPelota.getPosX() + pelPelota.getVelX());
+            pelPelota.setPosY(pelPelota.getPosY() + pelPelota.getVelY());
         } 
+        // Si no se esta moviendo se queda pegada a la camCamionra
         else{
-            bola.setPosX(bar.getPosX() + 20);
-            bola.setPosY(bar.getPosY() - 30);
+            pelPelota.setPosX(camCamion.getPosX() + 20);
+            pelPelota.setPosY(camCamion.getPosY() - 30);
         }
     }
 
@@ -281,152 +312,174 @@ public class BreakingBricks extends JFrame implements Runnable, KeyListener{
      * armadura y además con las orillas del <code>Applet</code>.
      */
     public void checaColision(){
-        if (bar.getPosX() + bar.getAncho() > getWidth()){
-            bar.setPosX(getWidth() - bar.getAncho());
+        // La barra no choca si colisiona con pared
+        if (camCamion.getPosX() + camCamion.getAncho() > getWidth()){
+            camCamion.setPosX(getWidth() - camCamion.getAncho());
         }
-        if (bar.getPosX() < 0){
-            bar.setPosX(0);
+        // La camCamionra no choca si colisiona con pared
+        if (camCamion.getPosX() < 0){
+            camCamion.setPosX(0);
         }
-        for (Meth1 i : lista1){
-            if (bola.intersecta(i) && !i.getChoca()){
+        // Para cada cristal dependiendo desde donde pega la pelPelota es hacia
+        // donde esta se dirigira ahora si no ha colisionado antes, se restan
+        // golpes, se escucha el sonido, y desaparecen si ya no tienen mas 
+        // golpes disponibles
+        for (Meth1 i : lnkCol1){
+            if (pelPelota.intersecta(i) && !i.getChoca()){
                 sColision.play();
                 i.setChoca(true);
-                if (i.getPosY() < bola.getPosY() + bola.getAlto() || 
-                        i.getPosY() + i.getAlto() > bola.getPosY()) { //por arriba o por abajo
-                    bola.setVelY(-bola.getVelY());
-                } else {                          //por la izquierda o la derecha
-                    bola.setVelX(-bola.getVelX());
+                if (i.getPosY() < pelPelota.getPosY() + pelPelota.getAlto() || 
+                        i.getPosY() + i.getAlto() > pelPelota.getPosY()){ 
+                    pelPelota.setVelY(-pelPelota.getVelY());
+                } 
+                else{                          
+                    pelPelota.setVelX(-pelPelota.getVelX());
                 }
                 i.RestaGolpe();
                 if (i.getHits() == 0){
-                    lista1.remove(i);
-                    contbloques++;
-                    score += 20;
+                    lnkCol1.remove(i);
+                    iScore += 20;
                     break;
                 }
                 i.Quebrar(i.getHits());
-                score += 10;
+                iScore += 10;
             } 
             else{
                 i.setChoca(false);
             }
         }
-        for (Meth2 i : lista2) {
-            if (bola.intersecta(i) && !i.getChoca()){
+        // Para cada cristal dependiendo desde donde pega la pelPelota es hacia
+        // donde esta se dirigira ahora si no ha colisionado antes, se restan
+        // golpes, se escucha el sonido, y desaparecen si ya no tienen mas 
+        // golpes disponibles
+        for (Meth2 i : lnkCol2) {
+            if (pelPelota.intersecta(i) && !i.getChoca()){
                 sColision.play();
                 i.setChoca(true);
-                if (i.getPosY() < bola.getPosY() + bola.getAlto() || 
-                        i.getPosY() + i.getAlto() > bola.getPosY()) { //por arriba o por abajo
-                    bola.setVelY(-bola.getVelY());
-                } else {                          //por la izquierda o la derecha
-                    bola.setVelX(-bola.getVelX());
-                }
-                i.RestaGolpe();
-                if (i.getHits() == 0) {
-                    contbloques++;
-                    lista2.remove(i);
-                    score += 20;
-                    break;
-                }
-                i.Quebrar(i.getHits());
-                score += 10;
-            } 
-            else if (!bola.intersecta(i)){
-                i.setChoca(false);
-            }
-        }
-        for (Meth1 i : lista3){
-            if (bola.intersecta(i) && !i.getChoca()){
-                sColision.play();
-                i.setChoca(true);
-                if (i.getPosY() < bola.getPosY() + bola.getAlto() || 
-                        i.getPosY() + i.getAlto() > bola.getPosY()) { //por arriba o por abajo
-                    bola.setVelY(-bola.getVelY());
+                if (i.getPosY() < pelPelota.getPosY() + pelPelota.getAlto() || 
+                        i.getPosY() + i.getAlto() > pelPelota.getPosY()){ 
+                    pelPelota.setVelY(-pelPelota.getVelY());
                 } 
-                else if (!bola.intersecta(i)){                                                                                           //por la izquierda o la derecha
-                    bola.setVelX(-bola.getVelX());
+                else{                        
+                    pelPelota.setVelX(-pelPelota.getVelX());
                 }
                 i.RestaGolpe();
                 if (i.getHits() == 0){
-                    contbloques++;
-                    lista3.remove(i);
-                    score += 20;
+                    lnkCol2.remove(i);
+                    iScore += 20;
                     break;
                 }
-                score += 10;
+                i.Quebrar(i.getHits());
+                iScore += 10;
+            } 
+            else if (!pelPelota.intersecta(i)){
+                i.setChoca(false);
+            }
+        }
+        // Para cada cristal dependiendo desde donde pega la pelPelota es hacia
+        // donde esta se dirigira ahora si no ha colisionado antes, se restan
+        // golpes, se escucha el sonido, y desaparecen si ya no tienen mas 
+        // golpes disponibles
+        for (Meth1 i : lnkCol3){
+            if (pelPelota.intersecta(i) && !i.getChoca()){
+                sColision.play();
+                i.setChoca(true);
+                if (i.getPosY() < pelPelota.getPosY() + pelPelota.getAlto() || 
+                        i.getPosY() + i.getAlto() > pelPelota.getPosY()){
+                    pelPelota.setVelY(-pelPelota.getVelY());
+                } 
+                else if (!pelPelota.intersecta(i)){                                                                                           //por la izquierda o la derecha
+                    pelPelota.setVelX(-pelPelota.getVelX());
+                }
+                i.RestaGolpe();
+                if (i.getHits() == 0){
+                    lnkCol3.remove(i);
+                    iScore += 20;
+                    break;
+                }
+                iScore += 10;
                 i.Quebrar(i.getHits());
             } 
             else{
                 i.setChoca(false);
             }
         }
-        for (Meth2 i : lista4){
-            if (bola.intersecta(i) && !i.getChoca()){
+        // Para cada cristal dependiendo desde donde pega la pelPelota es hacia
+        // donde esta se dirigira ahora si no ha colisionado antes, se restan
+        // golpes, se escucha el sonido, y desaparecen si ya no tienen mas 
+        // golpes disponibles
+        for (Meth2 i : lnkCol4){
+            if (pelPelota.intersecta(i) && !i.getChoca()){
                 sColision.play();
                 i.setChoca(true);
-                if (i.getPosY() < bola.getPosY() + bola.getAlto() || 
-                        i.getPosY() + i.getAlto() > bola.getPosY()) { //por arriba o por abajo
-                    bola.setVelY(-bola.getVelY());
+                if (i.getPosY() < pelPelota.getPosY() + pelPelota.getAlto() || 
+                        i.getPosY() + i.getAlto() > pelPelota.getPosY()) { 
+                    pelPelota.setVelY(-pelPelota.getVelY());
                 } 
-                else{                                                //por la izquierda o la derecha
-                    bola.setVelX(-bola.getVelX());
+                else{                                                
+                    pelPelota.setVelX(-pelPelota.getVelX());
                 }
                 i.RestaGolpe();
                 if (i.getHits() == 0){
-                    contbloques++;
-                    lista4.remove(i);
-                    score += 20;
+                    lnkCol4.remove(i);
+                    iScore += 20;
                     break;
                 }
-                score += 10;
+                iScore += 10;
                 i.Quebrar(i.getHits());
             } 
-            else if (!bola.intersecta(i)){
+            else if (!pelPelota.intersecta(i)){
                 i.setChoca(false);  
             }
         }
-
-        if (bola.intersecta(bar)){
-            if (bola.getPosY() + bola.getAlto() / 2 < bar.getPosY() 
-                    + bar.getAlto() / 2) {
-                bola.setVelY(-bola.getVelY());
+        // Si la bola intersecta con la barra se cambia su direccion en Y
+        // Y su velocidad en x dependiendo si llega la bola por derecha o izq
+        if (pelPelota.intersecta(camCamion)){
+            if (pelPelota.getPosY() + pelPelota.getAlto() / 2 < 
+                    camCamion.getPosY() 
+                    + camCamion.getAlto() / 2) {
+                pelPelota.setVelY(-pelPelota.getVelY());
                 sColision.play();
             }
-            if (bola.getPosX() + bola.getAncho() / 2 > bar.getPosX() 
-                    + bar.getAncho() / 2 && bola.getVelX() < 0){
-                bola.setVelX(-bola.getVelX());
+            if (pelPelota.getPosX() + pelPelota.getAncho() / 2 > 
+                    camCamion.getPosX() 
+                    + camCamion.getAncho() / 2 && pelPelota.getVelX() < 0){
+                pelPelota.setVelX(-pelPelota.getVelX());
                 sColision.play();
             } 
-            else if (bola.getPosX() + bola.getAncho() / 2 < bar.getPosX() 
-                    + bar.getAncho() / 2 && bola.getVelX() > 0){
-                bola.setVelX(-bola.getVelX());
+            else if (pelPelota.getPosX() + pelPelota.getAncho() / 2
+                    < camCamion.getPosX() 
+                    + camCamion.getAncho() / 2 && pelPelota.getVelX() > 0){
+                pelPelota.setVelX(-pelPelota.getVelX());
                 sColision.play();
             }
         }
-
-        if (bola.getPosX() < 5){
-            bola.setVelX(-bola.getVelX());
+        // Colisiones con de la pelPelota con las paredes
+        if (pelPelota.getPosX() < 5){
+            pelPelota.setVelX(-pelPelota.getVelX());
             sColision.play();
         } 
-        else if (bola.getPosY() < 20) {
-            bola.setVelY(-bola.getVelY());
+        else if (pelPelota.getPosY() < 20) {
+            pelPelota.setVelY(-pelPelota.getVelY());
             sColision.play();
         } 
-        else if (bola.getPosX() + bola.getAncho() > getWidth()){
-            bola.setVelX(-bola.getVelX());
+        else if (pelPelota.getPosX() + pelPelota.getAncho() > getWidth()){
+            pelPelota.setVelX(-pelPelota.getVelX());
             sColision.play();
         } 
-        else if (bola.getPosY() > getHeight()){
-            vidas--;
+        // Colision con la parte de abajo del frame que reduce vidas y reinicia
+        // su estado
+        else if (pelPelota.getPosY() > getHeight()){
+            iVidas--;
             sColision.play();
             bMovBola = false;
-            bola.setPosX(bar.getPosX() + 20);
-            bola.setPosY(bar.getPosY() - 30);
-            bola.setVelX(0);
-            while (bola.getVelX() == 0){
-                bola.setVelX((int) (Math.random() * 10) - 5);
+            pelPelota.setPosX(camCamion.getPosX() + 20);
+            pelPelota.setPosY(camCamion.getPosY() - 30);
+            pelPelota.setVelX(0);
+            while (pelPelota.getVelX() == 0){
+                pelPelota.setVelX((int) (Math.random() * 10) - 5);
             }
-            bola.setVelY(-4);
+            pelPelota.setVelY(-4);
         }
     }
 
@@ -465,81 +518,90 @@ public class BreakingBricks extends JFrame implements Runnable, KeyListener{
      *
      */
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_LEFT){//Al presionar la flecha izquierda se mueve a la izquierda
-            direccion = 3;
+        if (e.getKeyCode() == KeyEvent.VK_LEFT){
+        //Al presionar la flecha izquierda se mueve a la izquierda
+            iDireccion = 3;
             bMover = true;
         } 
         else if (e.getKeyCode() == KeyEvent.VK_RIGHT){
-            direccion = 4; //Al presionar la flecha derecha se mueve la barra a la derecha
+            iDireccion = 4; 
+            //Al presionar la flecha derecha se mueve la barra a la derecha
             bMover = true;
         } 
-        else if (e.getKeyCode() == KeyEvent.VK_P){//Al presionar la P activa la Pausa del juego
+        else if (e.getKeyCode() == KeyEvent.VK_P){
+            //Al presionar la P activa la Pausa del juego
             bPausa = !bPausa;
         } 
-        else if (e.getKeyCode() == KeyEvent.VK_SPACE){ //Al presionar la barra espaciadora lanza la pelota.
+        else if (e.getKeyCode() == KeyEvent.VK_SPACE){ 
+            //Al presionar la barra espaciadora lanza la pelota.
             if (!bMovBola) {
                 bMovBola = true;
             }
             bInicio = true;
         } 
-        else if (e.getKeyCode() == KeyEvent.VK_C){ //Al presionar la tecla R reinicia el juego.
+        else if (e.getKeyCode() == KeyEvent.VK_C){ 
+            //Al presionar la tecla R reinicia el juego. Se limpian todas
+            // las variables y se vuelven a declarar
             bPausa = false;
-            bar.setPosX(getWidth() / 2);
-            bar.setPosY(getHeight() - 30);
-            bola.setPosX(bar.getPosX() + 25);
-            bola.setPosY(bar.getPosY() - 25);
-            contbloques = 0;
-            vidas = 3;
-            score=0;
-            lista1.clear();
-            lista2.clear();
-            lista3.clear();
-            lista4.clear();
-            for (int i = 1; i < 15; i++){
+            camCamion.setPosX(getWidth() / 2);
+            camCamion.setPosY(getHeight() - 30);
+            pelPelota.setPosX(camCamion.getPosX() + 25);
+            pelPelota.setPosY(camCamion.getPosY() - 25);
+            iVidas = 3;
+            iScore=0;
+            lnkCol1.clear();
+            lnkCol2.clear();
+            lnkCol3.clear();
+            lnkCol4.clear();
+            for (int i = 1; i < 16; i++){
                 if (i == 1){
-                    pill = new Meth1(40, 70);
-                    lista1.add(pill);
+                    metCrist1 = new Meth1(40, 70);
+                    lnkCol1.add(metCrist1);
                 } 
                 else{
-                    Meth1 pillaux = (Meth1) lista1.get(i - 2);
-                    pill = new Meth1(pillaux.getPosX() + 50, pillaux.getPosY());
-                    lista1.add(pill);
+                    Meth1 metCrist1aux = (Meth1) lnkCol1.get(i - 2);
+                    metCrist1 = new Meth1(metCrist1aux.getPosX() + 50
+                            , metCrist1aux.getPosY());
+                    lnkCol1.add(metCrist1);
                 }
             }
             
-            for (int i = 1; i < 15; i++){
+            for (int i = 1; i < 16; i++){
                 if (i == 1){
-                    pillR = new Meth2(40, 120);
-                    lista2.add(pillR);
+                    metCrist2 = new Meth2(40, 120);
+                    lnkCol2.add(metCrist2);
                 } 
                 else{
-                    Meth2 pillaux = (Meth2) lista2.get(i - 2);
-                    pillR = new Meth2(pillaux.getPosX() + 50, pillaux.getPosY());
-                    lista2.add(pillR);
+                    Meth2 metCrist1aux = (Meth2) lnkCol2.get(i - 2);
+                    metCrist2 = new Meth2(metCrist1aux.getPosX() + 50
+                            , metCrist1aux.getPosY());
+                    lnkCol2.add(metCrist2);
                 }
             }
             
-            for (int i = 1; i < 15; i++){
+            for (int i = 1; i < 16; i++){
                 if (i == 1){
-                    pill = new Meth1(40, 170);
-                    lista3.add(pill);
+                    metCrist1 = new Meth1(40, 170);
+                    lnkCol3.add(metCrist1);
                 }
                 else{
-                    Meth1 pillaux = (Meth1) lista3.get(i - 2);
-                    pill = new Meth1(pillaux.getPosX() + 50, pillaux.getPosY());
-                    lista3.add(pill);
+                    Meth1 metCrist1aux = (Meth1) lnkCol3.get(i - 2);
+                    metCrist1 = new Meth1(metCrist1aux.getPosX() + 50
+                            , metCrist1aux.getPosY());
+                    lnkCol3.add(metCrist1);
                 }
             }
             
-            for (int i = 1; i < 15; i++){
+            for (int i = 1; i < 16; i++){
                 if (i == 1){
-                    pillR = new Meth2(40, 220);
-                    lista4.add(pillR);
+                    metCrist2 = new Meth2(40, 220);
+                    lnkCol4.add(metCrist2);
                 }
                 else{
-                    Meth2 pillaux = (Meth2) lista4.get(i - 2);
-                    pillR = new Meth2(pillaux.getPosX() + 50, pillaux.getPosY());
-                    lista4.add(pillR);
+                    Meth2 metCrist1aux = (Meth2) lnkCol4.get(i - 2);
+                    metCrist2 = new Meth2(metCrist1aux.getPosX() + 50
+                            , metCrist1aux.getPosY());
+                    lnkCol4.add(metCrist2);
                 }
             }
         }
@@ -552,12 +614,12 @@ public class BreakingBricks extends JFrame implements Runnable, KeyListener{
      * Metodo <I>keyReleased</I> sobrescrito de la clase
      * <code>KeyEvent</code>.<P>
      * En este método se verifica si alguna tecla que haya sido presionada es
-     * liberada. Si es liberada la booleana que controla el movimiento se
-     * convierte en falsa.
+     * liberada. 
      */
     public void keyReleased(KeyEvent e){
+        // Se deja de mover la barra
         bMover = false;
-        bar.setMoviendose(false);
+        camCamion.setMoviendose(false);
     }
 
    
@@ -570,58 +632,61 @@ public class BreakingBricks extends JFrame implements Runnable, KeyListener{
      * @paramg es el <code>objeto grafico</code> usado para dibujar.
      */
     public void paint1(Graphics g) {       
-         if (!bInicio){
+        // Si no se le ha presionado space esta la pagina de inicio
+        if (!bInicio){
             g.drawImage(imaInicio,0,0,this);
          }  
-         else{
-            if (score >= 1960 && vidas > 0){ //Cuando ganas se despliega la pantalla de creditos
-                //acabarjuego = true;
-                g.drawImage(victoria,0,0,this);  
+        else{
+            //Cuando ganas se muestra la pantalla de imaVictoria
+            if (iScore > 2080 && iVidas > 0){ 
+                g.drawImage(imaVictoria,0,0,this);  
                     g.setColor(Color.black);
-                    g.drawString("Puntos = " + score, 20, 150);
-                    g.drawString("Vidas = " + vidas, 20, 170);
+                    g.drawString("Puntos = " + iScore, 20, 150);
+                    g.drawString("Vidas = " + iVidas, 20, 170);
             }
-            else if (vidas > 0){
+            // Si iVidas es menor a 0 se pierde el juego
+            else if (iVidas > 0){
                 g.drawImage(fondo, 0, 0, this);
-                if (lista1 != null && bar != null){
-                    //Se Pintan todas las pildoras del juego
-                    for (Meth1 i : lista1){
+                if (lnkCol1 != null && camCamion != null){
+                    //Se pintan los cristales del juego
+                    for (Meth1 i : lnkCol1){
                         g.drawImage(i.getImagenI(), i.getPosX(), i.getPosY()
                                 , this);
                     }
-                    for (Meth2 i : lista2){
+                    for (Meth2 i : lnkCol2){
+                        g.drawImage(i.getImagenI(), i.getPosX(), i.getPosY()
+                                , this);
+                    }
+                    for (Meth1 i : lnkCol3) {
 
                         g.drawImage(i.getImagenI(), i.getPosX(), i.getPosY()
                                 , this);
                     }
-                    for (Meth1 i : lista3) {
-
+                    for (Meth2 i : lnkCol4) {
                         g.drawImage(i.getImagenI(), i.getPosX(), i.getPosY()
                                 , this);
                     }
-                    for (Meth2 i : lista4) {
-
-                        g.drawImage(i.getImagenI(), i.getPosX(), i.getPosY()
-                                , this);
-                    }
-
-                    g.drawImage(aniPelota.getImagen(), bola.getPosX()
-                            , bola.getPosY(), this);//Pinta la bola
+                    // Se pinta la barra y la pelPelota
+                    g.drawImage(aniPelota.getImagen(), pelPelota.getPosX()
+                            , pelPelota.getPosY(), this);
                     g.drawImage(aniCamion.getImagen()
-                            , bar.getPosX(), bar.getPosY(), this);  //Pinta la Barra
+                            , camCamion.getPosX(), camCamion.getPosY(), this);
+                    //Despliega los puntos y las iVidas 
+                    g.setColor(Color.white);
+                    g.setFont(new Font("TimesRoman", Font.PLAIN, 18));
+                    g.drawString("Puntos = " + iScore, 20, 50);
+                    g.drawString("Vidas = " + iVidas, 20, 70);
 
-                    g.setColor(Color.white);//Despliega los puntos, las vidas y el comando de Instrucciones
-                    g.drawString("Puntos = " + score, 20, 50);
-                    g.drawString("Vidas = " + vidas, 20, 70);
-
-                } else {
+                }
+                else{
                     //Da un mensaje mientras se carga el dibujo	
                     g.drawString("No se cargo la imagen..", 20, 20);
                 }
 
             } 
-            else if (vidas == 0) {
-               g.drawImage(game_over, 0, 0, this); //Cuando pierdes se despliega la pantalla de perder
+            else if (iVidas == 0) {
+               //Cuando pierdes se despliega la pantalla de game over
+               g.drawImage(imaGameOver, 0, 0, this); 
             }
         
         }
